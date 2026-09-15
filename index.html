@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="M哥與 SFZ 獨立候選名單、條件證據、K 線與籌碼的本機人工核對工作台。">
+  <meta name="color-scheme" content="light">
+  <title>M 研究室｜選股核對台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<a class="skip" href="#main">跳至主要內容</a>
+<header class="masthead">
+  <a class="brand" href="./"><span class="monogram">M<span>·</span></span><span>研究室<small>M × SFZ REVIEW DESK</small></span></a>
+  <nav aria-label="主要導覽"><a href="#routes">候選名單</a><a href="#workspace">個股核對</a><a href="#method">使用說明</a></nav>
+  <span class="edition">ONLINE RESEARCH <b>02</b></span>
+</header>
+<main id="main">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">SCREEN FIRST · VERIFY BY HAND</p>
+      <h1>選股核對台<span class="dot">.</span></h1>
+      <p class="lede">M哥與 SFZ 各自保留名單、版本與資料日。<br>圖表與條件是人工核對依據，不產生買賣訊號。</p>
+    </div>
+    <div class="snapshot-note">
+      <span class="status-dot"></span><span id="snapshot-label">正在讀取資料…</span>
+      <p id="snapshot-time">—</p><small id="snapshot-reference">收盤研究 · 非即時報價</small>
+    </div>
+  </section>
+
+  <div id="error" role="alert" hidden></div>
+  <section class="route-grid" id="routes" aria-label="獨立候選名單">
+    <article class="route-card" data-route-card="mge">
+      <div class="route-top"><span class="route-mark">M</span><span class="badge" id="mge-status">讀取中</span></div>
+      <p class="eyebrow">M哥主選股</p><h2 id="mge-count">—</h2>
+      <p id="mge-meta" class="route-meta">—</p><p id="mge-note" class="muted">—</p>
+      <button type="button" data-route-jump="mge">查看 M哥名單 <span>↘</span></button>
+    </article>
+    <article class="route-card sfz" data-route-card="sfz">
+      <div class="route-top"><span class="route-mark">S</span><span class="badge" id="sfz-status">讀取中</span></div>
+      <p class="eyebrow">SFZ 獨立路線</p><h2 id="sfz-count">—</h2>
+      <p id="sfz-meta" class="route-meta">—</p><p id="sfz-note" class="muted">—</p>
+      <button type="button" data-route-jump="sfz">查看 SFZ 名單 <span>↘</span></button>
+    </article>
+    <article class="health-card">
+      <div><p>資料涵蓋</p><strong id="coverage-value">—</strong><small id="coverage-detail">—</small></div>
+      <details id="market-details"><summary>大盤資料 <span id="market-summary">—</span></summary><div id="market-content"></div></details>
+      <p id="catalog-limit" class="muted">讀取資料限制中…</p>
+    </article>
+  </section>
+
+  <section class="workspace" id="workspace">
+    <aside class="stock-browser">
+      <div class="section-heading"><div><p class="eyebrow">WATCHLIST</p><h2>候選股票</h2></div><span id="result-count">—</span></div>
+      <label class="search"><span class="sr-only">搜尋股票</span><input id="stock-search" type="search" inputmode="search" autocomplete="off" placeholder="搜尋代號或名稱"><kbd>/</kbd></label>
+      <div class="filter-tabs" role="group" aria-label="名單篩選">
+        <button type="button" data-route="candidates" class="selected" aria-pressed="true">全部候選</button>
+        <button type="button" data-route="mge" aria-pressed="false">M哥</button>
+        <button type="button" data-route="sfz" aria-pressed="false">SFZ</button>
+        <button type="button" data-route="market" aria-pressed="false">全市場查詢</button>
+      </div>
+      <div id="stock-list" class="stock-list" aria-label="股票清單"></div>
+      <p class="list-help">顯示已入選名單；資料不足保留未知。切換「全市場查詢」可搜尋其餘股票。</p>
+    </aside>
+
+    <div class="detail-column">
+      <section class="stock-header panel" aria-labelledby="stock-name">
+        <div>
+          <p class="eyebrow" id="stock-symbol">選擇股票</p>
+          <h2 id="stock-name">等待資料</h2>
+          <div class="stock-badges" id="stock-badges"></div>
+        </div>
+        <div class="quote"><strong id="stock-close">—</strong><span id="stock-change">—</span><small id="price-basis">—</small></div>
+      </section>
+
+      <section class="review-panel panel" aria-labelledby="review-title">
+        <div class="section-heading"><div><p class="eyebrow">MANUAL REVIEW</p><h2 id="review-title">人工核對</h2></div><span id="review-saved" aria-live="polite">本機保存</span></div>
+        <p class="review-scope" id="review-scope">紀錄會依股票、規則版本與資料日分開保存。</p>
+        <div class="review-fields">
+          <label>核對狀態<select id="review-status" disabled><option value="pending">待核對</option><option value="confirmed">已確認</option><option value="watching">持續觀察</option><option value="excluded">排除</option></select></label>
+          <label class="note-field">核對筆記<textarea id="review-note" disabled rows="3" maxlength="6000" placeholder="記下人工判讀、待補資料或下次檢查重點…"></textarea></label>
+        </div>
+        <div class="review-actions"><button type="button" id="export-review" disabled>匯出此筆</button><button type="button" id="clear-review" class="quiet" disabled>清除此筆</button></div>
+      </section>
+
+      <section class="checks-panel panel" aria-labelledby="checks-title">
+        <div class="section-heading"><div><p class="eyebrow">EVIDENCE</p><h2 id="checks-title">條件與依據</h2></div><span>各路分開判讀</span></div>
+        <div class="check-columns">
+          <article><div class="check-heading"><h3>M哥 · A / B1 / B2</h3><span id="mge-detail-status" class="badge">—</span></div><p class="muted">A、B1、B2 是分別觀察，不要求全部成立；21 種型態由人工判讀。</p><div id="mge-checks"></div></article>
+          <article><div class="check-heading"><h3>SFZ · 獨立條件</h3><span id="sfz-detail-status" class="badge">—</span></div><p class="muted">僅呈現資料契約中的條件結果；新研究與回測尚未在此啟動。</p><div id="sfz-checks"></div></article>
+        </div>
+      </section>
+
+      <section class="chart-panel panel" aria-labelledby="chart-title">
+        <div class="section-heading chart-heading"><div><p class="eyebrow">PRICE × CHIPS</p><h2 id="chart-title">九序圖核對</h2></div><span id="chart-meta">—</span></div>
+        <div class="chart-toolbar">
+          <div class="tabs" role="group" aria-label="K 線週期"><button type="button" data-frame="day" class="selected" aria-pressed="true">日</button><button type="button" data-frame="week" aria-pressed="false">週</button><button type="button" data-frame="month" aria-pressed="false">月</button></div>
+          <div class="tabs" role="group" aria-label="圖表範圍"><button type="button" data-range="60">60</button><button type="button" data-range="120" class="selected" aria-pressed="true">120</button><button type="button" data-range="240">240</button><button type="button" data-range="all">全部</button></div>
+          <div class="chart-buttons"><button type="button" id="chart-back" aria-label="查看較早資料">←</button><button type="button" id="chart-forward" aria-label="查看較新資料">→</button><button type="button" id="chart-zoom-in" aria-label="放大圖表">＋</button><button type="button" id="chart-zoom-out" aria-label="縮小圖表">−</button><button type="button" id="chart-reset">回到最新</button></div>
+        </div>
+        <div class="ma-controls" role="group" aria-label="移動平均線">
+          <span>K / 量</span>
+          <label><input type="checkbox" data-ma="5" checked><i class="ma5"></i>MA5</label><label><input type="checkbox" data-ma="20" checked><i class="ma20"></i>MA20</label><label><input type="checkbox" data-ma="60" checked><i class="ma60"></i>MA60</label><label><input type="checkbox" data-ma="120" checked><i class="ma120"></i>MA120</label><label><input type="checkbox" data-ma="240" checked><i class="ma240"></i>MA240</label>
+        </div>
+        <p class="chart-help">滾輪縮放 · 拖曳前後移動 · 左右鍵逐根讀值 · PageUp／PageDown 平移 · ＋／− 縮放 · Home／End 跳至最早／最新</p>
+        <div id="chart-readout" class="chart-readout" aria-live="polite">移到圖表查看各日數值</div>
+        <div id="chart" class="chart-stack" tabindex="0" aria-label="九序同步股價與籌碼圖"></div>
+      </section>
+
+      <section class="provenance panel" aria-labelledby="provenance-title">
+        <div class="section-heading"><div><p class="eyebrow">PROVENANCE</p><h2 id="provenance-title">來源與限制</h2></div><span id="hash-status">—</span></div>
+        <div class="provenance-grid"><div><h3>來源</h3><div id="stock-sources"></div></div><div><h3>資料限制</h3><ul id="stock-limitations"></ul></div></div>
+      </section>
+    </div>
+  </section>
+
+  <section class="method" id="method">
+    <div><p class="eyebrow">READING THE DESK</p><h2>先看資料日，再做人工判讀。</h2></div>
+    <div class="method-items">
+      <article><span>01</span><div><h3>兩路名單保持獨立</h3><p>M哥與 SFZ 依各自規則版本及日期呈現。同股在兩路出現，不代表同日交集或今日推薦。</p></div></article>
+      <article><span>02</span><div><h3>缺值就是缺值</h3><p>籌碼 null 會留下斷點；整項未知時只顯示狀態與來源，不補成 0，也不畫推測曲線。</p></div></article>
+      <article><span>03</span><div><h3>人工紀錄只在這台瀏覽器</h3><p>核對狀態與筆記儲存在 localStorage，可匯出 JSON 備份；網站沒有伺服器同步或自動下單。</p></div></article>
+    </div>
+  </section>
+</main>
+<footer><a class="footer-brand" href="#main">M· 研究室</a><span>保留缺值，尊重時間，回到資料。</span><small>線上研究工作台 · 2026</small></footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>
