@@ -311,6 +311,16 @@ async function selectStock(row,{updateUrl=true}={}) {
   try{reviewQueue?.flush();}catch{$('review-saved').textContent='瀏覽器儲存空間不可用';}
   const requestId=++selectionRequestId;
   selectedRow=row; detail=null; renderStockList();
+  chart.setDetail(null);
+  $('stock-symbol').textContent=`${row.id} / 資料讀取中`;
+  for(const id of ['stock-close','stock-change','price-basis','hash-status','mge-detail-status','sfz-detail-status']) $(id).textContent='—';
+  $('hash-status').className='unverified';
+  $('stock-change').className='';
+  for(const id of ['mge-detail-status','sfz-detail-status']) $(id).className='badge unknown';
+  $('chart-readout').textContent='等待個股資料驗證';
+  clear($('stock-sources'));clear($('stock-limitations'));
+  $('review-status').value='pending';$('review-note').value='';
+  $('review-scope').textContent='等待個股資料驗證';$('review-saved').textContent='尚未載入';
   $('stock-name').textContent=`正在讀取 ${row.name || row.id}…`; $('chart').replaceChildren(node('div','loading','讀取個股資料…'));
   clear($('stock-badges')); clear($('mge-checks')).append(node('p','loading','讀取條件…')); clear($('sfz-checks')).append(node('p','loading','讀取條件…'));
   for (const id of ['review-status','review-note','export-review','clear-review']) $(id).disabled=true;
@@ -323,11 +333,12 @@ async function selectStock(row,{updateUrl=true}={}) {
     $('hash-status').className=packet.verification==='SHA-256 已驗證'?'verified':'unverified';
     renderStockHeader(); renderChecks('mge'); renderChecks('sfz'); renderSources(); loadReview();
     for (const id of ['review-status','review-note','export-review','clear-review']) $(id).disabled=false;
-    chart.setDetail(detail); syncChartControls();
+    chart.setDetail(detail); $('chart-readout').textContent='移到圖表查看各日數值'; syncChartControls();
     if (updateUrl) { const url=new URL(location.href); url.searchParams.set('stock',row.id); history.replaceState(null,'',url); }
   } catch (error) {
     if (requestId!==selectionRequestId) return;
     detail=null; $('error').hidden=false; $('error').textContent=`${row.id} 無法載入：${error.message}`;
+    $('chart-readout').textContent='個股資料無法驗證';
     $('stock-name').textContent='個股資料無法驗證'; clear($('stock-badges')).append(statusBadge('unknown','資料載入失敗 · 無法列為已驗證'));
     $('chart').replaceChildren(node('div','empty','資料載入失敗，不顯示圖表。'));
   }
