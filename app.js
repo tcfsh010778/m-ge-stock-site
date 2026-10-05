@@ -60,7 +60,7 @@ function availability(value) {
     verified_historical_xq_export:{className:'pass',text:'歷史 XQ 匯出已核對'},
     imported_not_independently_verified:{className:'unknown',text:'已匯入，未獨立驗證'},
     computed:{className:'pass',text:'已計算'},
-    computed_with_partial_prices:{className:'unknown',text:'已計算，部分價格缺漏'},
+    computed_with_partial_prices:{className:'unknown',text:'已計算，部分個股待驗證'},
     regular_ohlc_gap:{className:'unknown',text:'官方日K有缺漏'},
   };
   if (exact[value]) return exact[value];
@@ -125,7 +125,9 @@ function describeCoverage(coverage, stockCount) {
   const roster=coverage.roster ?? coverage.total ?? coverage.requested ?? coverage.universe_count ?? stockCount;
   const details=coverage.details ?? coverage.available ?? coverage.stock_count ?? coverage.available_stocks;
   const price=coverage.price || {};
-  const detail=[details!=null?`詳情 ${details}`:null,coverage.full_history_details!=null?`完整歷史 ${coverage.full_history_details}`:null,price.current!=null?`價格最新 ${price.current}`:null,price.regular_ohlc_gap?`日K缺漏 ${price.regular_ohlc_gap}`:null,price.stale?`過期 ${price.stale}`:null,price.missing?`缺漏 ${price.missing}`:null,price.rejected?`拒收 ${price.rejected}`:null,coverage.sfz?.unknown!=null?`SFZ未知 ${coverage.sfz.unknown}`:null].filter(Boolean).join(' · ')||'以 catalog 股票清單為準';
+  const priceUnknown=['regular_ohlc_gap','stale','missing','rejected'].reduce((sum,key)=>sum+(price[key]||0),0);
+  const indicatorUnknown=coverage.sfz?.unknown==null?null:Math.max(0,coverage.sfz.unknown-priceUnknown);
+  const detail=[details!=null?`詳情 ${details}`:null,coverage.full_history_details!=null?`完整歷史圖 ${coverage.full_history_details}`:null,price.current!=null?`最新且無已知價格缺口 ${price.current}`:null,price.regular_ohlc_gap?`價格已到參考日，但歷史OHLC缺值 ${price.regular_ohlc_gap}`:null,price.stale?`價格日期落後 ${price.stale}`:null,price.missing?`無通過驗證的歷史 ${price.missing}`:null,price.rejected?`輸入驗證拒收 ${price.rejected}`:null,indicatorUnknown?`價格可用但指標未定 ${indicatorUnknown}`:null,coverage.sfz?.unknown!=null?`SFZ未知合計 ${coverage.sfz.unknown}`:null].filter(Boolean).join(' · ')||'以 catalog 股票清單為準';
   return {value:`${roster} 檔`,detail};
 }
 
