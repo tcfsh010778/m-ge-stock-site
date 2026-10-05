@@ -61,6 +61,7 @@ function availability(value) {
     imported_not_independently_verified:{className:'unknown',text:'已匯入，未獨立驗證'},
     computed:{className:'pass',text:'已計算'},
     computed_with_partial_prices:{className:'unknown',text:'已計算，部分價格缺漏'},
+    regular_ohlc_gap:{className:'unknown',text:'官方日K有缺漏'},
   };
   if (exact[value]) return exact[value];
   if (['ok','complete','available','ready','pass'].includes(value)) return {className:'pass',text:'可用'};
@@ -253,7 +254,7 @@ function renderChecks(route) {
     if (inferred!==currentGroup) { currentGroup=inferred; appendText(target,'h4',inferred,'check-group'); }
     const row=node('div','check-row'), copy=node('div'), top=node('div','check-title');
     appendText(top,'strong',check.label || check.id || '未命名條件'); top.append(statusBadge(check.status)); copy.append(top);
-    appendText(copy,'small',check.method || '方法未提供','method-copy');
+    appendText(copy,'small',check.method === 'price_regular_ohlc_gap' ? '官方部分日期沒有可用日K；未補值，SFZ維持未知。' : check.method || '方法未提供','method-copy');
     appendText(copy,'p',`${formatCheckValue(check.value,check.unit)} · ${formatDate(check.as_of)}`,'check-value');
     appendText(copy,'p',resolveSourceLabel(check.source),'check-source');
     row.append(copy); target.append(row);
