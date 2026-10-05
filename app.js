@@ -125,7 +125,7 @@ function describeCoverage(coverage, stockCount) {
   const roster=coverage.roster ?? coverage.total ?? coverage.requested ?? coverage.universe_count ?? stockCount;
   const details=coverage.details ?? coverage.available ?? coverage.stock_count ?? coverage.available_stocks;
   const price=coverage.price || {};
-  const detail=[details!=null?`詳情 ${details}`:null,coverage.full_history_details!=null?`完整歷史 ${coverage.full_history_details}`:null,price.current!=null?`價格最新 ${price.current}`:null,price.stale?`過期 ${price.stale}`:null,price.missing?`缺漏 ${price.missing}`:null,price.rejected?`拒收 ${price.rejected}`:null].filter(Boolean).join(' · ')||'以 catalog 股票清單為準';
+  const detail=[details!=null?`詳情 ${details}`:null,coverage.full_history_details!=null?`完整歷史 ${coverage.full_history_details}`:null,price.current!=null?`價格最新 ${price.current}`:null,price.regular_ohlc_gap?`日K缺漏 ${price.regular_ohlc_gap}`:null,price.stale?`過期 ${price.stale}`:null,price.missing?`缺漏 ${price.missing}`:null,price.rejected?`拒收 ${price.rejected}`:null,coverage.sfz?.unknown!=null?`SFZ未知 ${coverage.sfz.unknown}`:null].filter(Boolean).join(' · ')||'以 catalog 股票清單為準';
   return {value:`${roster} 檔`,detail};
 }
 
