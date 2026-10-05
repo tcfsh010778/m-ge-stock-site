@@ -166,6 +166,8 @@ function validateDetail(value, expectedId) {
 }
 
 function renderHeader() {
+  const refresh=catalog.refresh;
+  $('refresh-status').textContent=refresh ? refresh.status === 'blocked' ? `更新受阻 · 目前 SFZ 仍截至 ${formatDate(refresh.source_as_of)} · 檢查時間 ${refresh.attempted_at || '未知'}。${refresh.note}` : `SFZ 官方行情截至 ${formatDate(refresh.source_as_of)} · 取得時間 ${refresh.retrieved_at || '未知'} · ${refresh.status === 'complete' || refresh.status === 'current' ? '來源刷新完成' : '部分資料可用'}。${refresh.note}` : '此版本尚無每日更新紀錄；名單依下方各路資料日呈現。';
   const historical = catalog.reference_date && catalog.reference_date !== localDateString();
   $('snapshot-label').textContent = historical ? '歷史資料快照' : '當日資料快照';
   $('snapshot-time').textContent = catalog.generated_at ? `產生時間 ${new Date(catalog.generated_at).toLocaleString('zh-TW',{hour12:false})}` : '產生時間未知';
